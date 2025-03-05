@@ -8,7 +8,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const sortAuthor = document.getElementById("sort-author");
     const groupBySelect = document.getElementById("group-by-select");
 
-    let books = [];
+    // Retrieve books from localStorage or initialize an empty array
+    let books = JSON.parse(localStorage.getItem('books')) || [];
+
+    // Load the book list from localStorage on page load
+    updateBookList();
 
     // Add book
     bookForm.addEventListener("submit", async function (e) {
@@ -28,8 +32,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const coverImage = await fetchBookCover(title, author);
 
-        const book = { title, author, series, genre, status, rating, coverImage };
+        const book = {title, author, series, genre, status, rating, coverImage};
         books.push(book);
+        saveBooksToLocalStorage();  // Save to localStorage
         updateBookList();
 
         bookForm.reset();
@@ -67,16 +72,16 @@ document.addEventListener("DOMContentLoaded", function () {
         const groupBy = groupBySelect.value;
 
         const filteredBooks = books
-            .filter((book) => {
-                // Filter by search term (title or author)
-                const matchesSearch = book.title.toLowerCase().includes(searchTerm) || book.author.toLowerCase().includes(searchTerm);
-                // Filter by genre if selected
-                const matchesGenre = genreFilter === "" || book.genre.toLowerCase().includes(genreFilter);
-                // Filter by status if selected
-                const matchesStatus = statusFilter === "" || book.status === statusFilter;
+                .filter((book) => {
+                    // Filter by search term (title or author)
+                    const matchesSearch = book.title.toLowerCase().includes(searchTerm) || book.author.toLowerCase().includes(searchTerm);
+                    // Filter by genre if selected
+                    const matchesGenre = genreFilter === "" || book.genre.toLowerCase().includes(genreFilter);
+                    // Filter by status if selected
+                    const matchesStatus = statusFilter === "" || book.status === statusFilter;
 
-                return matchesSearch && matchesGenre && matchesStatus;
-            });
+                    return matchesSearch && matchesGenre && matchesStatus;
+                });
 
         // Group books by the selected category (title or author)
         const groupedBooks = groupBooks(filteredBooks, groupBy);
@@ -90,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
             groupedBooks[group].forEach((book, index) => {
                 const row = document.createElement("tr");
 
-                row.innerHTML = `
+                row.innerHTML = ` 
                     <td><img src="${book.coverImage}" alt="Cover" class="book-cover"></td>
                     <td>${book.title}</td>
                     <td>${book.author}</td>
@@ -135,6 +140,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const index = parseInt(e.target.dataset.index, 10);
             if (!isNaN(index)) {
                 books.splice(index, 1);
+                saveBooksToLocalStorage();  // Save to localStorage
                 updateBookList();
             }
         }
@@ -153,6 +159,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     playCelebrationSound();
                 }
 
+                saveBooksToLocalStorage();  // Save to localStorage
                 updateBookList();
             }
         }
@@ -162,6 +169,11 @@ document.addEventListener("DOMContentLoaded", function () {
     function playCelebrationSound() {
         const audio = new Audio('celebration.mp3');  // Replace with your sound file
         audio.play();
+    }
+
+    // Save books to localStorage
+    function saveBooksToLocalStorage() {
+        localStorage.setItem('books', JSON.stringify(books));
     }
 
     // Search by title and author
