@@ -1,271 +1,113 @@
 body {
-    background-color:#f8f9fa;
+    background-color: #f8f9fa;
     font-family: Arial, sans-serif;
 }
 
 h1 {
     color: #343a40;
     font-weight: bold;
+    margin-bottom: 20px;
 }
 
-/* Table */
-.table th, .table td {
-    vertical-align: middle;
-    text-align: center;
-}
-
-.table-striped tbody tr:nth-of-type(odd) {
-    background-color: #f1f1f1;
-}
-
-.btn-danger {
-    margin-left: 5px;
-}
-
-/* Book Cover */
-.book-cover {
-    width: 50px;
-    height: 75px;
-    object-fit: cover;
-    border-radius: 5px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-/* Search bar */
-#search {
-    width: 100%;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    margin-bottom: 15px;
-}
-
-/* Filter, Sorting, and Grouping */
-#sort-title, #sort-author, #filter-genre, #filter-status, #group-by {
-    transition: all 0.3s ease-in-out;
-}
-
-#sort-title:hover, #sort-author:hover {
-    background-color: #007bff;
-    color: white;
-}
-
-/* Rating */
-.rating {
-    display: flex;
-    gap: 5px;
-    justify-content: center;
-}
-
-.rating span {
-    cursor: pointer;
-    font-size: 1.2rem;
-    color: #ffc107;
+/* Card Styles */
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s;
+    max-width: 180px;
 }
 
-.rating span:hover {
-    transform: scale(1.2);
+.card:hover {
+    transform: translateY(-5px);
 }
 
-/* Status */
-.status {
-    padding: 5px 10px;
-    border-radius: 5px;
+.card-body h5 {
     font-weight: bold;
-    text-align: center;
-    display: inline-block;
-    width: 100px;
+    color: #343a40;
+    font-size: 1rem;
 }
 
-.status-to-read {
-    background-color: #ffeb99;
-    color: #856404;
+.card-text {
+    color: #6c757d;
+    font-size: 0.85rem;
 }
 
-.status-reading {
-    background-color: #cc35ff;
-    color: #004085;
-}
-
-.status-completed {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-/* Celebration */
-#confetti-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-}
-
-.confetti-active {
-    opacity: 1;
-}
-
-@keyframes pop {
-    0% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.2);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
-
-.celebrate {
-    animation: pop 0.5s ease-in-out;
-}
-
-/* Grouping Styles */
+/* Group Header Styles */
 .group-header {
     background-color: #e9ecef;
-    font-weight: bold;
     padding: 10px;
-    text-align: left;
-    border-top: 2px solid #343a40;
-}
-body {
-    background-color:#f8f9fa;
-    font-family: Arial, sans-serif;
+    margin: 10px 0;
+    border-radius: 5px;
+    font-weight: bold;
+    color: #343a40;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-h1 {
+.average-rating {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* Modal Styles */
+.modal-content {
+    border-radius: 10px;
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-title {
     color: #343a40;
     font-weight: bold;
 }
 
-/* Table */
-.table th, .table td {
-    vertical-align: middle;
-    text-align: center;
+/* Button Styles */
+.btn-success {
+    transition: background-color 0.3s;
 }
 
-.table-striped tbody tr:nth-of-type(odd) {
-    background-color: #f1f1f1;
+.btn-success:hover {
+    background-color: #218838;
 }
 
-.btn-danger {
-    margin-left: 5px;
-}
-
-/* Book Cover */
-.book-cover {
-    width: 50px;
-    height: 75px;
-    object-fit: cover;
+.btn-outline-secondary, .btn-outline-danger {
     border-radius: 5px;
 }
 
-/* Search bar */
-#search {
-    width: 100%;
-    padding: 10px;
+/* Form Input Styles */
+input, select, textarea {
     border-radius: 5px;
-    border: 1px solid #ccc;
-    margin-bottom: 15px;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-/* Filter, Sorting, and Grouping */
-#sort-title, #sort-author, #filter-genre, #filter-status, #group-by {
-    transition: all 0.3s ease-in-out;
-}
-
-#sort-title:hover, #sort-author:hover {
-    background-color: #007bff;
-    color: white;
-}
-
-/* Rating */
-.rating {
-    display: flex;
-    gap: 5px;
-    justify-content: center;
-}
-
-.rating span {
-    cursor: pointer;
-    font-size: 1.2rem;
-    color: #ffc107;
-    transition: transform 0.2s;
-}
-
-.rating span:hover {
-    transform: scale(1.2);
-}
-
-/* Status */
-.status {
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-weight: bold;
-    text-align: center;
-    display: inline-block;
-    width: 100px;
-}
-
-.status-to-read {
-    background-color: #ffeb99;
-    color: #856404;
-}
-
-.status-reading {
-    background-color: #cc35ff;
-    color: #004085;
-}
-
-.status-completed {
-    background-color: #d4edda;
-    color: #155724;
+input:focus, select:focus, textarea:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 5px rgba(128, 189, 255, 0.5);
+    outline: none;
 }
 
 /* Celebration */
 #confetti-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
+    z-index: 1055;
+    opacity: 0.8;
+}
+
+/* General Spacing */
+.mb-4 {
+    margin-bottom: 2rem !important;
+}
+
+.p-3 {
+    padding: 1rem !important;
+}
+
+/* Card Image Styles */
+.book-cover {
     width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-}
-
-.confetti-active {
-    opacity: 1;
-}
-
-@keyframes pop {
-    0% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.2);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
-
-.celebrate {
-    animation: pop 0.5s ease-in-out;
-}
-
-/* Grouping Styles */
-.group-header {
-    background-color: #e9ecef;
-    font-weight: bold;
-    padding: 10px;
-    text-align: left;
-    border-top: 2px solid #343a40;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 10px 10px 0 0;
 }

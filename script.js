@@ -4,26 +4,22 @@ document.addEventListener("DOMContentLoaded", function () {
     const searchInput = document.getElementById("search");
     const filterGenre = document.getElementById("filter-genre");
     const filterStatus = document.getElementById("filter-status");
-    const sortTitle = document.getElementById("sort-title");
-    const sortAuthor = document.getElementById("sort-author");
-    const groupBySelect = document.getElementById("group-by-select");
+    const sortBy = document.getElementById("sort-by");
+    const groupBy = document.getElementById("group-by");
+    const celebrationSound = document.getElementById("celebration-sound");
 
-    // Retrieve books from localStorage or initialize an empty array
-    let books = JSON.parse(localStorage.getItem('books')) || [];
-
-    // Load the book list from localStorage on page load
-    updateBookList();
+    let books = [];
 
     // Add book
     bookForm.addEventListener("submit", async function (e) {
         e.preventDefault();
 
-        const title = document.getElementById("title").value.trim();
-        const author = document.getElementById("author").value.trim();
-        const series = document.getElementById("series").value.trim();
-        const genre = document.getElementById("genre").value.trim();
-        const status = document.getElementById("status").value;
-        const rating = document.getElementById("rating").value || 0;
+        const title = document.getElementById("title")?.value.trim() || "";
+        const author = document.getElementById("author")?.value.trim() || "";
+        const series = document.getElementById("series")?.value.trim() || "";
+        const genre = document.getElementById("genre")?.value.trim() || "";
+        const status = document.getElementById("status")?.value || "To Read";
+        const rating = parseFloat(document.getElementById("rating")?.value) || 0;
 
         if (!title || !author || !genre) {
             alert("Title, Author, and Genre are required!");
@@ -32,22 +28,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const coverImage = await fetchBookCover(title, author);
 
-        const book = {title, author, series, genre, status, rating, coverImage};
+        const book = { title, author, series, genre, status, rating, coverImage };
         books.push(book);
-        saveBooksToLocalStorage();  // Save to localStorage
         updateBookList();
 
         bookForm.reset();
+        const modalElement = document.getElementById('addBookModal');
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        if (modal) {
+            modal.hide();
+        }
     });
 
-    // Fetch book cover from Google Books API or Open Library
     async function fetchBookCover(title, author) {
         const googleApiUrl = `https://www.googleapis.com/books/v1/volumes?q=intitle:${encodeURIComponent(title)}+inauthor:${encodeURIComponent(author)}`;
-
         try {
             const response = await fetch(googleApiUrl);
             const data = await response.json();
-
             if (data.items && data.items.length > 0) {
                 return data.items[0].volumeInfo.imageLinks?.thumbnail || "default-cover.jpg";
             } else {
@@ -59,130 +56,107 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Update book list dynamically
     function updateBookList() {
         bookList.innerHTML = "";
+        const searchTerm = searchInput?.value.toLowerCase() || "";
+        const genreFilter = filterGenre?.value.toLowerCase() || "";
+        const statusFilter = filterStatus?.value || "";
+        const sortCriteria = sortBy?.value || "";
+        const groupCriteria = groupBy?.value || "";
 
-        // Get filter values
-        const searchTerm = searchInput.value.toLowerCase();
-        const genreFilter = filterGenre.value.toLowerCase();
-        const statusFilter = filterStatus.value;
+        let filteredBooks = books.filter((book) => {
+            const matchesSearch = book.title.toLowerCase().includes(searchTerm) || book.author.toLowerCase().includes(searchTerm);
+            const matchesGenre = genreFilter === "" || book.genre.toLowerCase().includes(genreFilter);
+            const matchesStatus = statusFilter === "" || book.status === statusFilter;
+            return matchesSearch && matchesGenre && matchesStatus;
+        });
 
-        // Group by selected category (Title or Author)
-        const groupBy = groupBySelect.value;
+        if (sortCriteria) {
+            filteredBooks.sort((a, b) => {
+                switch (sortCriteria) {
+                    case "title":
+                        return a.title.localeCompare(b.title);
+                    case "author":
+                        return a.author.localeCompare(b.author);
+                    case "genre":
+                        return a.genre.localeCompare(b.genre);
+                    case "status":
+                        return a.status.localeCompare(b.status);
+                    case "rating":
+                        return b.rating - a.rating;
+                    default:
+                        return 0;
+                }
+            });
+        }
 
-        const filteredBooks = books
-                .filter((book) => {
-                    // Filter by search term (title or author)
-                    const matchesSearch = book.title.toLowerCase().includes(searchTerm) || book.author.toLowerCase().includes(searchTerm);
-                    // Filter by genre if selected
-                    const matchesGenre = genreFilter === "" || book.genre.toLowerCase().includes(genreFilter);
-                    // Filter by status if selected
-                    const matchesStatus = statusFilter === "" || book.status === statusFilter;
+        if (groupCriteria) {
+            const groups = {};
+            filteredBooks.forEach((book) => {
+                const key = groupCriteria === "series" ? book.series || "No Series" : book.author;
+                if (!groups[key]) {
+                    groups[key] = [];
+                }
+                groups[key].push(book);
+            });
 
-                    return matchesSearch && matchesGenre && matchesStatus;
-                });
+            Object.entries(groups).forEach(([groupName, groupBooks]) => {
+                const averageRating = (
+                    groupBooks.reduce((sum, book) => sum + parseFloat(book.rating), 0) / groupBooks.length
+                ).toFixed(2);
 
-        // Group books by the selected category (title or author)
-        const groupedBooks = groupBooks(filteredBooks, groupBy);
-
-        // Display grouped books
-        for (const group in groupedBooks) {
-            const groupHeader = document.createElement("tr");
-            groupHeader.innerHTML = `<td colspan="8" class="font-weight-bold">${group}</td>`;
-            bookList.appendChild(groupHeader);
-
-            groupedBooks[group].forEach((book, index) => {
-                const row = document.createElement("tr");
-
-                row.innerHTML = ` 
-                    <td><img src="${book.coverImage}" alt="Cover" class="book-cover"></td>
-                    <td>${book.title}</td>
-                    <td>${book.author}</td>
-                    <td>${book.series || "-"}</td>
-                    <td>${book.genre}</td>
-                    <td>
-                        <select class="form-select status-select" data-index="${index}">
-                            <option value="To Read" ${book.status === "To Read" ? "selected" : ""}>To Read</option>
-                            <option value="Reading" ${book.status === "Reading" ? "selected" : ""}>Reading</option>
-                            <option value="Completed" ${book.status === "Completed" ? "selected" : ""}>Completed</option>
-                        </select>
-                    </td>
-                    <td>${book.rating} ★</td>
-                    <td>
-                        <button class="btn btn-danger btn-sm delete" data-index="${index}">Delete</button>
-                    </td>
+                bookList.innerHTML += `
+                    <div class="group-header">
+                        <span>${groupName}</span>
+                        <span class="average-rating">Average Rating: ${averageRating} ★</span>
+                    </div>
                 `;
 
-                bookList.appendChild(row);
+                groupBooks.forEach((book, index) => createBookCard(book, index));
             });
+        } else {
+            filteredBooks.forEach((book, index) => createBookCard(book, index));
         }
     }
 
-    // Group books by title or author
-    function groupBooks(books, groupBy) {
-        const grouped = {};
-
-        books.forEach((book) => {
-            const groupKey = groupBy === "author" ? book.author : book.title;
-            if (!grouped[groupKey]) {
-                grouped[groupKey] = [];
-            }
-            grouped[groupKey].push(book);
-        });
-
-        return grouped;
+    function createBookCard(book, index) {
+        const card = document.createElement("div");
+        card.className = "col card mb-3 p-2";
+        card.innerHTML = `
+            <div class="card h-100">
+                <img src="${book.coverImage}" class="card-img-top book-cover" alt="Cover">
+                <div class="card-body">
+                    <h5 class="card-title">${book.title}</h5>
+                    <p class="card-text">Author: ${book.author}</p>
+                    <p class="card-text">Series: ${book.series || "-"}</p>
+                    <p class="card-text">Genre: ${book.genre}</p>
+                    <p class="card-text">Rating: ${book.rating} ★</p>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-outline-danger btn-sm delete" data-index="${index}">Delete</button>
+                </div>
+            </div>
+        `;
+        bookList.appendChild(card);
     }
 
-    // Delete book
     bookList.addEventListener("click", function (e) {
         if (e.target.classList.contains("delete")) {
             const index = parseInt(e.target.dataset.index, 10);
             if (!isNaN(index)) {
                 books.splice(index, 1);
-                saveBooksToLocalStorage();  // Save to localStorage
                 updateBookList();
             }
         }
     });
 
-    // Handle status updates
-    bookList.addEventListener("change", function (e) {
-        if (e.target.classList.contains("status-select")) {
-            const index = parseInt(e.target.dataset.index, 10);
-            if (!isNaN(index)) {
-                const newStatus = e.target.value;
-                books[index].status = newStatus;
-
-                // Play celebration sound if status is "Completed"
-                if (newStatus === "Completed") {
-                    playCelebrationSound();
-                }
-
-                saveBooksToLocalStorage();  // Save to localStorage
-                updateBookList();
-            }
-        }
-    });
-
-    // Play celebration sound
     function playCelebrationSound() {
-        const audio = new Audio('celebration.mp3');  // Replace with your sound file
-        audio.play();
+        celebrationSound.play();
     }
 
-    // Save books to localStorage
-    function saveBooksToLocalStorage() {
-        localStorage.setItem('books', JSON.stringify(books));
-    }
-
-    // Search by title and author
-    searchInput.addEventListener("input", updateBookList);
-
-    // Filter by genre and status
-    filterGenre.addEventListener("change", updateBookList);
-    filterStatus.addEventListener("change", updateBookList);
-
-    // Group by title or author
-    groupBySelect.addEventListener("change", updateBookList);
+    searchInput?.addEventListener("input", updateBookList);
+    filterGenre?.addEventListener("change", updateBookList);
+    filterStatus?.addEventListener("change", updateBookList);
+    sortBy?.addEventListener("change", updateBookList);
+    groupBy?.addEventListener("change", updateBookList);
 });

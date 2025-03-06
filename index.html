@@ -8,100 +8,119 @@
         <link rel="stylesheet" href="styles.css">
     </head>
     <body class="container mt-4">
-        
-        <h1 class="text-center">Book Log</h1>
-        
-        <!-- Search, Filter, and Group Books -->
-        <div class="row mb-3">
+        <h1 class="text-center mb-4">Book Log</h1>
+
+        <!-- Search, Filter, Sort, and Group Controls -->
+        <div class="row mb-4">
+            <!-- Search Bar -->
             <div class="col-md-3">
-                <input type="text" id="search" class="form-control mb-3" placeholder="Search by title or author">
+                <input type="text" id="search" class="form-control" placeholder="Search by title or author...">
             </div>
-            <div class="col-md-3">
-                <select id="filter-genre" class="form-control">
+
+            <!-- Filter by Genre -->
+            <div class="col-md-2">
+                <select id="filter-genre" class="form-select">
                     <option value="">Filter by Genre</option>
-                </select>    
+                    <option value="Fiction">Fiction</option>
+                    <option value="Non-Fiction">Non-Fiction</option>
+                    <option value="Fantasy">Fantasy</option>
+                    <option value="Science Fiction">Science Fiction</option>
+                    <option value="Mystery">Mystery</option>
+                    <option value="Biography">Biography</option>
+                </select>
             </div>
-            <div class="col-md-3">
-                <select id="filter-status" class="form-control">
+
+            <!-- Filter by Status -->
+            <div class="col-md-2">
+                <select id="filter-status" class="form-select">
                     <option value="">Filter by Status</option>
                     <option value="To Read">To Read</option>
                     <option value="Reading">Reading</option>
                     <option value="Completed">Completed</option>
                 </select>
             </div>
-            <div class="col-md-3 d-flex">
-                <button id="sort-title" class="btn btn-secondary me-2">Sort by Title</button>
-                <button id="sort-author" class="btn btn-secondary">Sort by Author</button>
+
+            <!-- Sort Options -->
+            <div class="col-md-2">
+                <select id="sort-by" class="form-select">
+                    <option value="">Sort By</option>
+                    <option value="title">Title</option>
+                    <option value="author">Author</option>
+                    <option value="genre">Genre</option>
+                    <option value="status">Reading Status</option>
+                    <option value="rating">Rating</option>
+                </select>
             </div>
-        </div>
-        
-        <!-- Group By Selection -->
-        <div class="row mb-3">
+
+            <!-- Group By Options -->
             <div class="col-md-3">
-                <select id="group-by" class="form-control">
-                    <option value="none">No Grouping</option>
+                <select id="group-by" class="form-select">
+                    <option value="">No Grouping</option>
                     <option value="series">Group by Series</option>
                     <option value="author">Group by Author</option>
                 </select>
             </div>
         </div>
-        
-        <!-- Add Books -->
-        <form id="book-form" class="mb-3">
-            <div class="row">
-                <div class="col-md-3">
-                    <input type="text" id="title" class="form-control" placeholder="Book Title" required>
-                </div>
-                <div class="col-md-3">
-                    <input type="text" id="author" class="form-control" placeholder="Author" required>
-                </div>    
-                <div class="col-md-2">
-                    <input type="text" id="series" class="form-control" placeholder="Series (Optional)">
-                </div>
-                <div class="col-md-2">
-                    <input type="text" id="genre" class="form-control" placeholder="Genre" required>
-                </div>
-                <div class="col-md-2">
-                    <select id="status" class="form-control">
-                        <option value="To Read">To Read</option>
-                        <option value="Reading">Reading</option>
-                        <option value="Completed">Completed</option>
-                    </select>
-                </div>
-                <div class="col-md-1">
-                    <input type="number" id="rating" class="form-control" placeholder="Rating" min="1" max="5">
-                </div>
-                <div class="col-md-1">
-                    <button type="submit" class="btn btn-primary w-100">Add</button>
+
+        <!-- Add Book Modal -->
+        <div class="modal fade" id="addBookModal" tabindex="-1" aria-labelledby="addBookModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addBookModalLabel">Add a New Book</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="book-form">
+                            <div class="mb-3">
+                                <input type="text" id="title" class="form-control" placeholder="Book Title" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="text" id="author" class="form-control" placeholder="Author" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="text" id="series" class="form-control" placeholder="Series (Optional)">
+                            </div>
+                            <div class="mb-3">
+                                <input type="text" id="genre" class="form-control" placeholder="Genre" required>
+                            </div>
+                            <div class="mb-3">
+                                <select id="status" class="form-select">
+                                    <option value="To Read">To Read</option>
+                                    <option value="Reading">Reading</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <input type="number" id="rating" class="form-control" placeholder="Rating (1-5)" min="1" max="5">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Add Book</button>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </form>
-        
-        <!-- Display List of Books -->
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Cover</th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Series</th>
-                    <th>Genre</th>
-                    <th>Status</th>
-                    <th>Rating</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="book-list">
-                <!-- Books will be added dynamically -->
-            </tbody>
-        </table>
-        
-        <canvas id="confetti-canvas"></canvas>
-        
+        </div>
+
+        <!-- Button to Open Add Book Modal -->
+        <div class="text-end mb-4">
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addBookModal">
+                Add Book
+            </button>
+        </div>
+
+        <!-- Display List of Books using Cards -->
+        <div id="book-list" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <!-- Books will be added dynamically as cards -->
+        </div>
+
         <!-- Celebration Sound -->
         <audio id="celebration-sound" src="celebration.mp3"></audio>
-        
-        <!-- Scripts, handles all features of the site -->
+
+        <!-- Confetti Canvas -->
+        <canvas id="confetti-canvas"></canvas>
+
+        <!-- Scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="script.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     </body>
